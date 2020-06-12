@@ -1,0 +1,23 @@
+#!/bin/sh
+
+# Using a lot of what luke smith did, but changed it around for my own purposes.
+
+onescreen() { # If only one output available or chosen.
+	xrandr --output $1 --auto --output $2 --off
+	}
+
+# Get all possible displays
+allposs=$(xrandr -q | grep "connected")
+
+# Get all connected screens.
+screens=$(echo "$allposs" | awk '/ connected/ {print $1}')
+
+# Get user choice including multi-monitor and manual selection:
+chosen=$(printf "$screens" | dmenu -i -p "Select display:") &&
+notchosen=$(echo $screens | sed s/"$chosen"//)
+case "$chosen" in
+	*) onescreen "$chosen" "$notchosen" ;;
+esac
+
+#I will need to factor this in to change which side the monitor is on
+#xrandr --output HDMI-1 --left-of eDP-1
