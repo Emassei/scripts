@@ -12,12 +12,26 @@ allposs=$(xrandr -q | grep "connected")
 # Get all connected screens.
 screens=$(echo "$allposs" | awk '/ connected/ {print $1}')
 
-# Get user choice including multi-monitor and manual selection:
-chosen=$(printf "$screens" | dmenu -i -p "Select display:") &&
-notchosen=$(echo $screens | sed s/"$chosen"//)
-case "$chosen" in
-	*) onescreen "$chosen" "$notchosen" ;;
-esac
+twoscreens() {
+#two screens not mirroring
+  xrandr --output HDMI-1 --auto --output eDP-1 --auto --right-of HDMI-1
+}
 
-#I will need to factor this in to change which side the monitor is on
-#xrandr --output HDMI-1 --left-of eDP-1
+twomirroredscreens() {
+#Two screens mirrored
+  xrandr --output HDMI-1 --auto --output eDP-1 --auto
+}
+
+# Get user choice including multi-monitor and manual selection:
+chosen=$(printf "External Monitor\\nLaptop Display\\nTwo Monitors\\nMirrored" "$screens" | dmenu -i -p "Select Display Option:") &&
+
+if [ "$chosen" == "External Monitor" ]; then
+       	onescreen "HDMI-1" "eDP-1"
+elif [ "$chosen" == "Laptop Display" ]; then
+       	onescreen  "eDP-1" "HDMI-1"
+elif [ "$chosen" == "Two Monitors" ]; then
+  twoscreens
+else
+  twomirroredscreens
+fi
+

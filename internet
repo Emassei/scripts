@@ -1,0 +1,23 @@
+#!/bin/sh
+
+# Using a lot of what luke smith did, but changed it around for my own purposes.
+
+#onescreen() { # If only one output available or chosen.
+	#xrandr --output $1 --auto --output $2 --off
+	#}
+
+# Get all possible displays
+#allposs=$(xrandr -q | grep "connected")
+
+# Get all connected screens.
+chosen_connection=$(nmcli connection show | awk '{ print $1}' | dmenu) &&
+chosen=$(printf "$screens" | dmenu -i -p "Select display:") &&
+notchosen=$(echo $screens | sed s/"$chosen"//)
+case "$chosen" in
+	*) onescreen "$chosen" "$notchosen" ;;
+esac
+# display all conections with active connections in red
+# if unactivated connection selected connect
+# if activated connection selected disconnect
+
+
